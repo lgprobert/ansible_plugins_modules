@@ -1,0 +1,22 @@
+---
+- name: Prepare the container
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Install Nginx
+      ansible.builtin.apt:
+        name: nginx
+        state: present
+        update_cache: true
+
+    - name: Create a "hello world" index.html
+      ansible.builtin.copy:
+        content: "hello world"
+        dest: /var/www/html/index.html
+        mode: '0644'
+
+    - name: Ensure Nginx is running
+      ansible.builtin.service:
+        name: nginx
+        state: started
+        enabled: true

@@ -1,0 +1,23 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+platforms:
+  - name: instance
+    image: python:3.9-slim
+    pre_build_image: true
+    command: tail -f /dev/null
+    published_ports:
+      - "1080:80"
+provisioner:
+  name: ansible
+  playbooks:
+    prepare: prepare.yml
+    verify: verify.yml
+  env:
+    ANSIBLE_LIBRARY: "../../src/plugins/modules/"
+    ANSIBLE_LOOKUP_PLUGINS: "../../src/plugins/lookup/"
+    ANSIBLE_INVENTORY_PLUGINS: "../../src/plugins/inventory/"
+verifier:
+  name: ansible

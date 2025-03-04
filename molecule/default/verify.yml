@@ -1,0 +1,58 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Get container details
+      hostip:
+        ansible_host: "{{ inventory_hostname }}"
+      register: result
+
+    - name: Set ansible_host to container IP
+      ansible.builtin.set_fact:
+        ansible_host: "{{ result.hostip }}"
+
+    - ansible.builtin.debug:
+        msg: "container: {{ inventory_hostname }}, IP: {{ ansible_host }}"
+
+    - name: Assert ansible_host is an IP address
+      ansible.builtin.assert:
+        that:
+          - ansible_host is match("^(\\d{1,3}\\.){3}\\d{1,3}$")
+        fail_msg: "ansible_host is not an IP address: {{ ansible_host }}"
+        success_msg: "ansible_host is a valid IP address: {{ ansible_host }}"
+
+    - name: Check if Nginx is accessible at published port on  host
+      uri:
+        url: "http://localhost:1080"
+        return_content: true
+      register: nginx_response
+      until: "'hello world' in nginx_response.content"
+      retries: 5
+      delay: 2
+      delegate_to: localhost
+
+    - name: Succeed if Nginx return hello world
+      debug:
+        msg: "Access from host to nginx from puslibhsed port succeeds."
+      when: "'hello world' in nginx_response.content"
+
+    - name: Check if Nginx returns hello world
+      uri:
+        url: "http://{{ ansible_host }}"
+        return_content: true
+      register: nginx_response
+      until: "'hello world' in nginx_response.content"
+      retries: 5
+      delay: 2
+      delegate_to: localhost
+
+    - name: Fail if Nginx does not return hello world
+      fail:
+        msg: "Nginx did not return 'hello world'"
+      when: "'hello world' not in nginx_response.content"
+
+    - name: Succeed if Nginx return hello world
+      debug:
+        msg: "hostip module successfully resolve container IP to ansible_host"
+      when: "'hello world' in nginx_response.content"

@@ -1,0 +1,2 @@
+db_path: examples/inventory.db
+plugin: sqlite

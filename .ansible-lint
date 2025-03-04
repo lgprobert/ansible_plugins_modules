@@ -1,0 +1,10 @@
+skip_list:
+  - name[missing]
+  - no-changed-when
+  - fqcn-builtins
+  - yaml
+  - unnamed-task
+  - meta-no-info
+warn_list: []
+exclude_paths:
+  - "src/plugins/modules/hostip"

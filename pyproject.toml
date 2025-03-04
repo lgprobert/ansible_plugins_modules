@@ -1,0 +1,17 @@
+[tool.black]
+line-length = 90
+target-version = ["py310", "py39", "py38"]
+
+[tool.isort]
+profile = "black"
+
+[tool.mypy]
+disable_error_code = ["import-untyped"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["plugins.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+pythonpath = "src/plugins/inventory"
